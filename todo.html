@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <!-- Bootstrap CSS -->
+     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+
+    <title>To Do App</title>
+    <style>
+        #header{
+            font-size: 25px;
+        }
+        a{
+            color: white;
+        }
+    
+    </style>
+</head>
+<body>
+    <div class="container p-3">
+<h1 class="app-title" id="header"> To Do App</h1>
+<div class="card">
+    <div class="card-header">
+New Task
+</div>
+<div class="card-body">
+    <form class="addTaskForm">
+        <div class="input-group mt-3">
+        <input id="txtTaskName"type="text" class="form-control" placeholder="Type a New Task">
+        <div class="input-group-append">
+            <button class="btn btn-primary" type="submit" id="btnAddNewTask"><i class="fas fa-plus"></i></button>
+        </div></div>
+
+    </form>
+</div>
+</div>
+<div class="card mt-3"><div class="card-header">
+    Task List <a id="btnDeleteAll" href="#" class="btn btn-outline-danger btn-sm delete-all float-right">Delete All</a>
+</div>
+<ul id="task-list" class="list-group"></ul>
+</div>
+    </div>
+
+    <script src="https://kit.fontawesome.com/673506ae78.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+ 
+    <script>
+     
+
+const form = document.querySelector('form');
+const input = document.querySelector('#txtTaskName');
+const btnDeleteAll = document.querySelector('#btnDeleteAll');
+const taskList = document.querySelector('#task-list');
+let items;
+
+
+loadItems();
+
+
+eventListeners();
+
+function eventListeners() {
+  
+    form.addEventListener('submit', addNewItem);
+
+   
+    taskList.addEventListener('click', deleteItem);
+
+    
+    btnDeleteAll.addEventListener('click', deleteAllItems);
+}
+
+function loadItems() {
+    items = getItemsFromLS();
+    items.forEach(function (item) {
+        createItem(item);
+    });
+}
+
+
+function getItemsFromLS(){
+    if(localStorage.getItem('items')===null){
+        items = [];
+    }else{
+        items = JSON.parse(localStorage.getItem('items'));
+    }
+    return items;
+}
+
+
+function setItemToLS(text){
+    items = getItemsFromLS();
+    items.push(text);
+    localStorage.setItem('items',JSON.stringify(items));
+}
+
+
+function deleteItemFromLS(text){
+    items = getItemsFromLS();
+    items.forEach(function(item,index){
+        if(item === text){
+            items.splice(index,1);   
+        }
+    });
+    localStorage.setItem('items',JSON.stringify(items));
+}
+
+
+function createItem(text) {
+ 
+    const li = document.createElement('li');
+    li.className = 'list-group-item list-group-item-secondary';
+    li.appendChild(document.createTextNode(text));
+
+   
+    const a = document.createElement('a');
+    a.classList = 'delete-item float-right';
+    a.setAttribute('href', '#');
+    a.innerHTML = '<i class="fas fa-times"></i>';
+
+  
+    li.appendChild(a);
+
+   
+    taskList.appendChild(li);
+
+}
+
+
+function addNewItem(e) {
+    if (input.value === '') {
+        alert('add new item');
+    }
+
+   
+    createItem(input.value);
+
+  
+    setItemToLS(input.value);
+
+  
+    input.value = '';
+
+    e.preventDefault();
+
+}
+
+
+function deleteItem(e) {
+    if (e.target.className === 'fas fa-times') {
+        if (confirm('sure ?')) {
+            e.target.parentElement.parentElement.remove();
+
+           
+            deleteItemFromLS(e.target.parentElement.parentElement.textContent);
+        }
+    }
+    e.preventDefault();
+}
+
+
+function deleteAllItems(e) {
+
+    if (confirm('sure ?')) {
+       
+        while(taskList.firstChild){
+            taskList.removeChild(taskList.firstChild);
+        }
+        localStorage.clear();
+    }
+    e.preventDefault();
+}
+
+
+    </script>
+</body>
+</html>
